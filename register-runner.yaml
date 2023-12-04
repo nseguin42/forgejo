@@ -1,0 +1,35 @@
+version: "3"
+
+services:
+  demo-workflow:
+    image: alpine:3.18
+    links:
+      - forgejo
+    depends_on:
+      runner-register:
+        condition: service_completed_successfully
+    command: >-
+      sh -ec '
+      apk add --quiet git curl jq ;
+      mkdir -p /srv/demo ;
+      cd /srv/demo ;
+      git init --initial-branch=main ;
+      mkdir -p .forgejo/workflows ;
+      echo "{ on: [push], jobs: { test: { runs-on: docker, steps: [ {uses: actions/checkout@v4}, { run: echo All Good } ] } } }" > .forgejo/workflows/demo.yml ;
+      git add . ;
+      git config user.email root@example.com ;
+      git config user.name username ;
+      git commit -m demo ;
+      while : ; do
+        git push --set-upstream --force http://root:{ROOT_PASSWORD}@forgejo:3000/root/test main && break ;
+        sleep 5 ;
+      done ;
+      sha=`git rev-parse HEAD` ;
+      for delay in 1 1 1 1 2 5 5 10 10 10 15 30 30 30 30 30 30 30 ; do
+        curl -sS -f http://forgejo:3000/api/v1/repos/root/test/commits/$$sha/status | jq --raw-output .state | tee status ;
+        if grep success status ; then echo DEMO WORKFLOW SUCCESS && break ; fi ;
+        if grep failure status ; then echo DEMO WORKFLOW FAILURE && break ; fi ;
+        sleep $$delay ;
+      done ;
+      grep success status || echo DEMO WORKFLOW FAILURE
+      '      
