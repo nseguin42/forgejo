@@ -21,6 +21,7 @@ services:
       - FORGEJO__database__USER=forgejo
       - FORGEJO__database__PASSWD=forgejo
       - FORGEJO__server__DOMAIN="git.nseguin.dev"
+      - FORGEJO__server__SSH_DOMAIN="git.nseguin.dev"
       - FORGEJO__server__ROOT_URL="https://git.nseguin.dev/"
       - FORGEJO__service__DISABLE_REGISTRATION=true
       - INSTALL_LOCK=true
