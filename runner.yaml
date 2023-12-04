@@ -1,0 +1,44 @@
+version: "3"
+
+volumes:
+  runner-data:
+
+services:
+  docker-in-docker:
+    image: docker:dind
+    privileged: true
+    command: [ "dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false" ]
+
+  runner-register:
+    image: code.forgejo.org/forgejo/runner:3.2.0
+    links:
+      - docker-in-docker
+    environment:
+      DOCKER_HOST: tcp://docker-in-docker:2375
+    volumes:
+      - runner-data:/data
+    user: 0:0
+    command: >-
+      bash -ec '
+      while : ; do
+        sleep 5 ;
+        forgejo-runner create-runner-file --instance https://git.nseguin.dev --name docker-runner --secret 7c31591e8b67225a116d4a4519ea8e507e08f71f && break ;
+      done ;
+      forgejo-runner generate-config > config.yml ;
+      sed -i -e "s|network: .*|network: host|" config.yml ;
+      sed -i -e "s|labels: \[\]|labels: \[\"docker:docker://alpine:3.18\"\]|" config.yml ;
+      chown -R 1000:1000 /data
+      '      
+
+  runner-daemon:
+    image: code.forgejo.org/forgejo/runner:3.2.0
+    links:
+      - docker-in-docker
+    environment:
+      DOCKER_HOST: tcp://docker-in-docker:2375
+    depends_on:
+      runner-register:
+        condition: service_completed_successfully
+    volumes:
+      - runner-data:/data
+    command: "forgejo-runner --config config.yml daemon"
