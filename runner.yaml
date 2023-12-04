@@ -10,7 +10,7 @@ services:
     command: [ "dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false" ]
 
   runner-register:
-    image: code.forgejo.org/forgejo/runner:3.2.0
+    image: code.forgejo.org/forgejo/runner:3.3.0
     links:
       - docker-in-docker
     environment:
@@ -31,7 +31,7 @@ services:
       '      
 
   runner-daemon:
-    image: code.forgejo.org/forgejo/runner:3.2.0
+    image: code.forgejo.org/forgejo/runner:3.3.0
     links:
       - docker-in-docker
     environment:
