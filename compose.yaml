@@ -60,10 +60,7 @@ services:
     privileged: true
     command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
     depends_on:
-      forgejo:
-        condition: service_started # TODO add healthcheck
-        restart: true
-
+      - forgejo
   runner-register:
     image: code.forgejo.org/forgejo/runner:3.3.0
     links:
@@ -71,8 +68,7 @@ services:
     environment:
       DOCKER_HOST: tcp://docker-in-docker:2375
     depends_on:
-      docker-in-docker:
-        condition: service_started # TODO add healthcheck
+      - docker-in-docker
     volumes:
       - runner-data:/data
     user: 0:0
