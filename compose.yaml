@@ -61,7 +61,7 @@ services:
     command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
     depends_on:
       forgejo:
-        condition: service_healthy
+        condition: service_started # TODO add healthcheck
         restart: true
 
   runner-register:
@@ -72,7 +72,7 @@ services:
       DOCKER_HOST: tcp://docker-in-docker:2375
     depends_on:
       docker-in-docker:
-        condition: service_healthy
+        condition: service_started # TODO add healthcheck
     volumes:
       - runner-data:/data
     user: 0:0
