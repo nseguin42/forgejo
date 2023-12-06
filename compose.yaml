@@ -25,6 +25,7 @@ services:
       - APP_NAME="nseguin.dev"
       - FORGEJO__server__SSH_PORT=3022
       - FORGEJO__server__SSH_LISTEN_PORT=22
+      - FORGEJO__server__LANDING_PAGE="login"
     restart: unless-stopped
     networks:
       - forgejo
