@@ -86,6 +86,7 @@ services:
 
   runner-daemon:
     image: code.forgejo.org/forgejo/runner:3.3.0
+    restart: on-failure:3
     links:
       - docker-in-docker
     environment:
