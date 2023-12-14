@@ -29,7 +29,10 @@ services:
       - FORGEJO__indexer__ISSUE_INDEXER_CONN_STR="http://es01:9200"
       - FORGEJO__indexer__REPO_INDEXER_ENABLED=true
       - FORGEJO__indexer__REPO_INDEXER_TYPE=elasticsearch
-      - FORGEJO__indexer__REPO_INDEXER_CONN_STR="http://es02:9200"
+      - FORGEJO__indexer__REPO_INDEXER_CONN_STR="http://es01:9200"
+      - FORGEJO__cache__ADAPTER=redis
+      - FORGEJO__cache__HOST="redis://redis:6379/0?pool_size=100&idle_timeout=180s"
+      - FORGEJO__session__PROVIDER="db"
       - INSTALL_LOCK=true
       - APP_NAME="nseguin.dev"
       - FORGEJO__server__SSH_PORT=3022
@@ -121,6 +124,26 @@ services:
       - bootstrap.memory_lock=true
       - xpack.security.enabled=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+
+  redis:
+    image: redis:7
+    container_name: redis
+    restart: unless-stopped
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
+    networks:
+      - forgejo
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 15s
+      timeout: 3s
+      retries: 30
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - /mnt/data/forgejo/redis:/data
 
   docker-in-docker:
     image: docker:dind
