@@ -28,7 +28,6 @@ services:
       - APP_NAME="nseguin.dev"
       - FORGEJO__server__SSH_PORT=3022
       - FORGEJO__server__SSH_LISTEN_PORT=22
-      - FORGEJO__server__LANDING_PAGE="login"
       - FORGEJO__repository__ENABLE_PUSH_CREATE_USER=true
     restart: unless-stopped
     networks:
