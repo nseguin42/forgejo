@@ -114,7 +114,7 @@ services:
         soft: -1
         hard: -1
     environment:
-      - node.name=es02
+      - node.name=es03
       - cluster.name=es-docker-cluster
       - cluster.initial_master_nodes=es01,es02,es03
       - discovery.seed_hosts=es01,es02
@@ -128,6 +128,7 @@ services:
     command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
     depends_on:
       - forgejo
+
   runner-register:
     image: code.forgejo.org/forgejo/runner:3.3.0
     links:
